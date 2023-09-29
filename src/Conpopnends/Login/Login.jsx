@@ -1,4 +1,4 @@
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from 'firebase/auth';
 import { useRef, useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import auth from '../firbase/firebase.config';
@@ -10,27 +10,49 @@ const Login = () => {
     const emailref = useRef(null);
 
 
-    const handleLogin = e =>{
+    const handleLogin = e => {
         e.preventDefault();
         const email = e.target.email.value;
         const password = e.target.password.value;
         console.log(email, password)
         seterror('')
         setuser('')
+
         signInWithEmailAndPassword(auth, email, password)
-        .then(result =>{
-            const user = result.user;
-            console.log(user)
-            setuser("YOUR ACCOUNT IS LOGGED IN PLEASE ENRER THIS")
-        })
-        .catch(error =>{
-            const errore =  error.message;
-            seterror(errore);
-        })
+            .then(result => {
+                const user = result.user;
+                console.log(user)
+                if (user.emailVerified) {
+                    setuser("YOUR ACCOUNT IS LOGGED IN PLEASE ENRER THIS")
+                }
+                else {
+                    alert('Please veryfied your email')
+                }
+            })
+            .catch(error => {
+                const errore = error.message;
+                seterror(errore);
+            })
     }
 
-    const handleresetpassword = () =>{
-        console.log('forget password handle')
+    const handleresetpassword = () => {
+        const email = emailref.current.value;
+        if (!email) {
+            console.log('Please provide your email', emailref.current.value)
+            return;
+        }
+        else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+            console.log('Pleas write a valid email')
+            return;
+        }
+        // alert('PLease chek your email')
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                alert('please chek your email')
+            })
+            .catch(error => {
+                console.log(error);
+            })
     }
     return (
         <div>
@@ -47,13 +69,13 @@ const Login = () => {
                                     <label className="label">
                                         <span className="label-text">Email</span>
                                     </label>
-                                    <input 
-                                    type="email" 
-                                    name="email"
-                                    ref={emailref} 
-                                    placeholder="email" 
-                                    className="input input-bordered" 
-                                    required />
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        ref={emailref}
+                                        placeholder="email"
+                                        className="input input-bordered"
+                                        required />
                                 </div>
                                 <div className="form-control">
                                     <label className="label">

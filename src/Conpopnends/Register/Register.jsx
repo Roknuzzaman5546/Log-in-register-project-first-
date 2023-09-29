@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import auth from "../firbase/firebase.config";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -9,10 +9,11 @@ const Register = () => {
     const [show, setShow] = useState(false)
     const hadndlesubmit = e => {
         e.preventDefault();
+        const name = e.target.name.value;
         const email = e.target.email.value;
         const password = e.target.password.value;
         const chekd = e.target.cheakbox.checked;
-        console.log(email, password, chekd)
+        console.log(name, email, password, chekd)
         seterror('')
         setuser('')
         if (password.length < 6) {
@@ -31,6 +32,19 @@ const Register = () => {
             .then(userCredential => {
                 const user = userCredential.user
                 setuser('Register succesfully Enter your account')
+
+                updateProfile(user, {
+                    displayName: name,
+                    photoURL: "https://example.com/jane-q-user/profile.jpg"
+                })
+                .then(() => console.log('udated profile'))
+                .catch((error) => {
+                    console.log(error)
+                })
+                sendEmailVerification(user)
+                .then(() =>{
+                    alert('Please chek your email and veryfi your account')
+                })
                 console.log(user)
             })
             .catch(error => {
@@ -53,6 +67,12 @@ const Register = () => {
                             <div className="card-body">
                                 <div className="form-control">
                                     <label className="label">
+                                        <span className="label-text">Name</span>
+                                    </label>
+                                    <input type="text" placeholder="email" name="name" className="input input-bordered" required />
+                                </div>
+                                <div className="form-control">
+                                    <label className="label">
                                         <span className="label-text">Email</span>
                                     </label>
                                     <input type="email" placeholder="email" name="email" className="input input-bordered" required />
@@ -63,7 +83,7 @@ const Register = () => {
                                     </label>
                                     <div className=" relative">
                                         <input
-                                            type={show ? 'password' : 'text'}
+                                            type={show ? 'text' : 'password'}
                                             placeholder="password"
                                             name="password"
                                             className="input input-bordered w-full" required />
