@@ -7,33 +7,38 @@ const Register = () => {
     const [error, seterror] = useState('')
     const [user, setuser] = useState('')
     const [show, setShow] = useState(false)
-    const hadndlesubmit = e =>{
+    const hadndlesubmit = e => {
         e.preventDefault();
         const email = e.target.email.value;
-        const password = e.target.password.value; 
-        console.log(email, password)
+        const password = e.target.password.value;
+        const chekd = e.target.cheakbox.checked;
+        console.log(email, password, chekd)
         seterror('')
         setuser('')
-        if(password.length < 6){
+        if (password.length < 6) {
             seterror('Password should be at least 6 characters add more')
             return;
         }
-        else if(!/[A-Z]/.test(password)){
+        else if (!/[A-Z]/.test(password)) {
             seterror('Please add 1 or more carecter Upercase')
             return;
         }
+        else if(!chekd){
+            seterror('Pelase fill up our condition')
+            return;
+        }
         createUserWithEmailAndPassword(auth, email, password)
-        .then(userCredential =>{
-            const user = userCredential.user
-            setuser('Register succesfully Enter your account')
-            console.log(user)
-        })
-        .catch(error =>{
-            // const errorCode = error.code;
-            const errorMessage = error.message; 
-            seterror(errorMessage)
-            console.log(error)
-        })
+            .then(userCredential => {
+                const user = userCredential.user
+                setuser('Register succesfully Enter your account')
+                console.log(user)
+            })
+            .catch(error => {
+                // const errorCode = error.code;
+                const errorMessage = error.message;
+                seterror(errorMessage)
+                console.log(error)
+            })
     }
     return (
         <div>
@@ -56,28 +61,34 @@ const Register = () => {
                                     <label className="label">
                                         <span className="label-text">Password</span>
                                     </label>
-                                    <input 
-                                    type={show ? 'password': 'text'} 
-                                    placeholder="password" 
-                                    name="password" 
-                                    className="input input-bordered" required />
-                                    <span onClick={() => setShow(!show)}>
-                                    {
-                                        show ? <FaEye></FaEye> : <FaEyeSlash></FaEyeSlash>
-                                    }</span>
+                                    <div className=" relative">
+                                        <input
+                                            type={show ? 'password' : 'text'}
+                                            placeholder="password"
+                                            name="password"
+                                            className="input input-bordered w-full" required />
+                                        <span onClick={() => setShow(!show)} className=" absolute top-4 right-3">
+                                            {
+                                                show ? <FaEyeSlash></FaEyeSlash> : <FaEye></FaEye>
+                                            }</span>
+                                    </div>
                                     <label className="label">
                                         <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                                     </label>
                                 </div>
+                                <div>
+                                    <input type="checkbox" name="cheakbox" id="terms" />
+                                    <label htmlFor="terms">Please Fill <a href="">Up our conditon</a></label>
+                                </div>
                                 <div className="form-control mt-6">
                                     <button className="btn btn-primary"><input type="submit" value="Register" /></button>
                                 </div>
-                            {
-                                error && <p className=" text-red-500">{error}</p>
-                            }
-                            {
-                                user && <p className=" text-green-500">{user}</p> 
-                            }
+                                {
+                                    error && <p className=" text-red-500">{error}</p>
+                                }
+                                {
+                                    user && <p className=" text-green-500">{user}</p>
+                                }
                             </div>
                         </form>
                     </div>
